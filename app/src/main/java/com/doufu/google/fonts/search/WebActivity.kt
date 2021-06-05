@@ -17,16 +17,16 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.res.booleanResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.doufu.google.fonts.search.ui.theme.GoogleFontsSearchTheme
 import com.doufu.google.fonts.search.utils.DFLog
+import com.doufu.google.fonts.search.utils.gotoBrowser
 
 class WebActivity : ComponentActivity() {
     companion object {
@@ -45,7 +45,6 @@ class WebActivity : ComponentActivity() {
         setContent {
 //            ProvideWindowInsets {
             GoogleFontsSearchTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     mainUI(url.value)
                 }
@@ -65,50 +64,70 @@ class WebActivity : ComponentActivity() {
         val rememberProgress = remember { mutableStateOf(0.1f) }
         val showProgress = remember { mutableStateOf(false) }
         Column(modifier = Modifier) {
-            WebViewView(modifier = Modifier,
-                url = url, onProgressChanged = {
-                    rememberProgress.value = it / 100.0f
-                    showProgress.value = it != 100
-                })
             if (showProgress.value) {
                 LinearProgressIndicator(
                     progress = rememberProgress.value,
+                    color = Color.Red,
                     modifier = Modifier
                         .fillMaxWidth()
                 )
             }
+            WebViewView(modifier = Modifier.weight(1.0f),
+                url = url, onProgressChanged = {
+                    rememberProgress.value = it / 100.0f
+                    showProgress.value = it != 100
+                })
             BottomAppBar(
-                modifier = Modifier,
-//                backgroundColor = MaterialTheme.colors.primarySurface,
+                modifier = Modifier.height(50.dp),
+                backgroundColor = Color.White,
 //                contentColor = contentColorFor(MaterialTheme.colors.backgroundColor),
 //                cutoutShape: Shape? = null,
                 elevation = AppBarDefaults.BottomAppBarElevation,
                 contentPadding = AppBarDefaults.ContentPadding
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_search_48),
-                    contentDescription = stringResource(id = R.string.app_name),
-                    modifier = Modifier
-                        .clickable(onClick = {
-
-                        })
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.ic_search_48),
-                    contentDescription = stringResource(id = R.string.app_name),
-                    modifier = Modifier
-                        .clickable(onClick = {
-
-                        })
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.ic_search_48),
-                    contentDescription = stringResource(id = R.string.app_name),
-                    modifier = Modifier
-                        .clickable(onClick = {
-
-                        })
-                )
+                ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                    val (btnLeft, btnRight, btnBrowser) = createRefs()
+//                    Image(
+//                        painter = painterResource(id = R.drawable.ic_baseline_chevron_left_24),
+//                        contentDescription = stringResource(id = R.string.app_name),
+//                        modifier = Modifier
+//                            .width(48.dp)
+//                            .height(48.dp)
+//                            .constrainAs(btnLeft) {
+//                                start.linkTo(parent.start, margin = 10.dp)
+//                                end.linkTo(btnRight.start)
+//                            }
+//                            .clickable(onClick = {
+//
+//                            })
+//                    )
+//                    Image(
+//                        painter = painterResource(id = R.drawable.ic_baseline_chevron_right_24),
+//                        contentDescription = stringResource(id = R.string.app_name),
+//                        modifier = Modifier
+//                            .width(48.dp)
+//                            .height(48.dp)
+//                            .constrainAs(btnRight) {
+//                                start.linkTo(btnLeft.end)
+//                            }
+//                            .clickable(onClick = {
+//
+//                            })
+//                    )
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_baseline_open_in_browser_24),
+                        contentDescription = stringResource(id = R.string.app_name),
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(48.dp)
+                            .constrainAs(btnBrowser) {
+                                end.linkTo(parent.end, margin = 10.dp)
+                            }
+                            .clickable(onClick = {
+                                this@WebActivity.gotoBrowser(this@WebActivity.url.value)
+                            })
+                    )
+                }
             }
         }
 
